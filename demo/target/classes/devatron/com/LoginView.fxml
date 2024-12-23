@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
 <VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.LoginController" stylesheets="@styles.css">
-    <Label text="Login" style="-fx-font-size: 24; -fx-font-weight: bold;" />
-    <TextField fx:id="usernameField" promptText="Username" style="-fx-pref-width: 300;" />
-    <PasswordField fx:id="passwordField" promptText="Password" style="-fx-pref-width: 300;" />
-    <Button text="Login" onAction="#onLoginClick" style="-fx-pref-width: 100;" />
-    <Label fx:id="errorLabel" textFill="red" />
+    <!-- Intestazione -->
+    <HBox alignment="CENTER" styleClass="header-container">
+        <Label text="Login" styleClass="header-label" />
+    </HBox>
 
-    <Label text="Non hai un account? Registrati qui:" />
-    <TextField fx:id="registerUsernameField" promptText="Nome" style="-fx-pref-width: 300;" />
-    <PasswordField fx:id="registerPasswordField" promptText="Password" style="-fx-pref-width: 300;" />
-    <Button text="Registrati" onAction="#onRegisterClick" style="-fx-pref-width: 100;" />
+    <!-- Form di login -->
+    <VBox spacing="10" alignment="CENTER" styleClass="form-container">
+        <TextField fx:id="usernameField" promptText="Username" styleClass="custom-text-field" />
+        <PasswordField fx:id="passwordField" promptText="Password" styleClass="custom-text-field" />
+        <Button text="Login" fx:id="loginButton" onAction="#onLoginClick" styleClass="primary-button" />
+        <Label fx:id="errorLabel" textFill="red" visible="false" />
+    </VBox>
+
+    <!-- Registrazione -->
+    <VBox spacing="10" alignment="CENTER" styleClass="form-container">
+        <Label text="Non hai un account? Registrati qui:" />
+        <TextField fx:id="registerUsernameField" promptText="Nome Utente" styleClass="custom-text-field" />
+        <PasswordField fx:id="registerPasswordField" promptText="Password" styleClass="custom-text-field" />
+        <Button text="Registrati" fx:id="registerButton" onAction="#onRegisterClick" styleClass="primary-button" />
+    </VBox>
 </VBox>

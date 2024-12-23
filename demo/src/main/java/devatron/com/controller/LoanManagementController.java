@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import org.bson.Document;
@@ -58,13 +59,11 @@ public class LoanManagementController {
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-/*************  ✨ Codeium Command ⭐  *************/
     /**
      * Configura la tabella dei prestiti con le colonne desiderate e carica i dati
      * presenti nel database. Configura inoltre il pulsante "Indietro" per tornare
      * alla schermata di login.
      */
-/******  3d40e2ce-e1d3-42a0-acba-714414c16008  *******/
     public void initialize() {
         // Configura le colonne della tabella
         bookTitleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBookTitle()));
@@ -81,6 +80,15 @@ public class LoanManagementController {
 
         // Configura il pulsante "Indietro"
         backButton.setOnAction(event -> handleBack());
+
+        loanTable.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.DELETE) {
+                Loan selectedLoan = loanTable.getSelectionModel().getSelectedItem();
+                if (selectedLoan != null) {
+                    deleteLoan(selectedLoan);
+                }
+            }
+        });
     }
 
     private ObservableList<Loan> getLoans() {
@@ -112,10 +120,23 @@ public class LoanManagementController {
                 }
             }
 
-            loanList.add(new Loan(bookTitle, username, firstName, lastName, email, phoneNumber, loanDate, returnDate));
+            loanList.add(new Loan(bookTitle, username ,firstName, lastName, email, phoneNumber, loanDate, returnDate));
         }
 
         return FXCollections.observableArrayList(loanList);
+    }
+
+    private void deleteLoan(Loan loan) {
+        MongoDatabase database = DatabaseConnection.getDatabase();
+        MongoCollection<Document> loans = database.getCollection("loans");
+
+        Document query = new Document("bookTitle", loan.getBookTitle())
+                .append("username", loan.getUsername())
+                .append("loanDate", loan.getLoanDate().toString());
+
+        loans.deleteOne(query);
+        loanTable.getItems().remove(loan);
+        System.out.println("Prestito eliminato: " + loan);
     }
 
     public void setCurrentUser (User user) {

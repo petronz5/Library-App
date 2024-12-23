@@ -1,41 +1,118 @@
-/* styles.css */
-
+/* Stile generale */
 .root {
-    -fx-font-family: "Arial";
-    -fx-background-color: #f0f0f0;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: #f7f9fc; /* Colore di sfondo leggermente azzurro */
 }
 
-.label {
+/* Intestazioni */
+.header-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
     -fx-text-fill: #333;
+    -fx-padding: 10;
 }
 
-.button {
-    -fx-background-color: #4CAF50; /* Verde */
-    -fx-text-fill: white;
-    -fx-padding: 5px 10px;
-    -fx-font-size: 12px;
+.header-container {
+    -fx-background-color: #4CAF50; /* Verde principale */
+    -fx-padding: 20;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-alignment: center;
+}
+
+/* Contenitore dei form */
+.form-container {
+    -fx-padding: 20;
+    -fx-spacing: 15;
+    -fx-background-color: #ffffff; /* Sfondo bianco per i form */
+    -fx-border-color: #ddd; /* Bordo grigio chiaro */
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-alignment: center;
+}
+
+/* Campi di testo */
+.custom-text-field {
+    -fx-pref-width: 350;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
     -fx-border-radius: 5;
+    -fx-padding: 8;
+    -fx-font-size: 14px;
 }
 
-.button:hover {
+.custom-text-field:focused {
+    -fx-border-color: #4CAF50; /* Verde quando selezionato */
+    -fx-border-width: 2;
+}
+
+/* Pulsanti */
+.primary-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.primary-button:hover {
     -fx-background-color: #45a049; /* Verde scuro */
 }
 
-.text-field {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #ccc;
+.secondary-button {
+    -fx-background-color: #e7e7e7; /* Grigio chiaro */
+    -fx-text-fill: #333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
     -fx-border-radius: 5;
-    -fx-padding: 5;
+    -fx-background-radius: 5;
 }
 
-.list-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #ccc;
-    -fx-border-radius: 5;
+.secondary-button:hover {
+    -fx-background-color: #d6d6d6; /* Grigio più scuro */
 }
 
+/* Tabelle */
 .table-view {
     -fx-background-color: #ffffff;
     -fx-border-color: #ccc;
     -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-font-size: 14px;
 }
+
+.table-view .column-header {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+/* Liste */
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+/* Messaggi di errore */
+.label-error {
+    -fx-text-fill: red;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+/* Pulsanti hover */
+.button:hover {
+    -fx-cursor: hand; /* Puntatore di tipo "mano" */
+}
+
+#quantityField {
+    -fx-pref-width: 100;
+}
+

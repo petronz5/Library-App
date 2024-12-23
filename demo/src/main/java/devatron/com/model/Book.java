@@ -9,11 +9,13 @@ public class Book {
     private final StringProperty title;
     private final StringProperty author;
     private final IntegerProperty quantity;
+    private final StringProperty editor;
 
-    public Book(String title, String author, int quantity) {
+    public Book(String title, String author, int quantity, String editor) {
         this.title = new SimpleStringProperty(title);
         this.author = new SimpleStringProperty(author);
         this.quantity = new SimpleIntegerProperty(quantity);
+        this.editor = new SimpleStringProperty(editor);
     }
 
     // Title property
@@ -53,5 +55,18 @@ public class Book {
 
     public void setQuantity(int quantity) {
         this.quantity.set(quantity);
+    }
+
+    // Editor property
+    public StringProperty editorProperty() {
+        return editor;
+    }
+
+    public String getEditor() {
+        return editor.get();
+    }
+
+    public void setEditor(String editor) {
+        this.editor.set(editor);
     }
 }

@@ -28,6 +28,9 @@ public class BookController {
     private TableColumn<Book, String> authorColumn;
 
     @FXML
+    private TableColumn<Book, String> editorColumn;
+
+    @FXML
     private TableColumn<Book, Integer> quantityColumn;
 
     @FXML
@@ -50,6 +53,9 @@ public class BookController {
 
     @FXML
     private TextField authorField;
+
+    @FXML
+    private TextField editorField;
 
     @FXML
     private TextField quantityField;
@@ -106,6 +112,7 @@ public class BookController {
         // Initialize TableView columns
         titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         authorColumn.setCellValueFactory(cellData -> cellData.getValue().authorProperty());
+        editorColumn.setCellValueFactory(cellData -> cellData.getValue().editorProperty());
         quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 
         // Load books into the ObservableList
@@ -147,12 +154,13 @@ public class BookController {
     private void openLoanManagementForBook(Book book) {
         try {
             System.out.println("Opening loan management for book: " + book.getTitle());
-            App.showLoanManagementScreenWithBook(book);
+            App.showLoanManagementScreenWithBook(book, currentUser); // Passa currentUser
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error opening loan management: " + e.getMessage());
         }
     }
+    
 
     private List<Book> getBooks() {
         try {
@@ -164,9 +172,10 @@ public class BookController {
             for (Document doc : booksCollection.find()) {
                 String title = doc.getString("title");
                 String author = doc.getString("author");
+                String editor = doc.getString("editor");
                 int quantity = doc.getInteger("quantity", 0); // Default to 0 if null
                 System.out.println("Book found: Title='" + title + "', Author='" + author + "', Quantity=" + quantity);
-                bookList.add(new Book(title, author, quantity));
+                bookList.add(new Book(title, author, quantity, editor));
             }
 
             System.out.println("Total books retrieved: " + bookList.size());
@@ -181,9 +190,10 @@ public class BookController {
     private void addBook() {
         String title = titleField.getText();
         String author = authorField.getText();
+        String editor = editorField.getText();
         int quantity;
 
-        if (title.isEmpty() || author.isEmpty() || quantityField.getText().isEmpty()) {
+        if (title.isEmpty() || author.isEmpty() || editor.isEmpty() || quantityField.getText().isEmpty()) {
             System.out.println("All fields must be filled.");
             return;
         }
@@ -201,12 +211,14 @@ public class BookController {
 
             Document newBook = new Document("title", title)
                     .append("author", author)
+                    .append(editor, editor)
                     .append("quantity", quantity);
             booksCollection.insertOne(newBook);
             System.out.println("Book added: Title='" + title + "', Author='" + author + "', Quantity=" + quantity);
 
             titleField.clear();
             authorField.clear();
+            editorField.clear();
             quantityField.clear();
 
             // Refresh the TableView

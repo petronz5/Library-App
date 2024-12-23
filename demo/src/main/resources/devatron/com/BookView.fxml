@@ -1,39 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.BookController" spacing="15" alignment="TOP_CENTER" stylesheets="@styles.css">
+<VBox alignment="TOP_CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.BookController" spacing="15" stylesheets="@styles.css">
     <!-- Header -->
-    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
-        <Button fx:id="adminButton" text="Area Amministrativa" />
-        <Button fx:id="loanManagementButton" text="Gestione Prestiti" />
+    <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="header-container">
+        <Button fx:id="adminButton" text="Area Amministrativa" styleClass="primary-button" />
+        <Button fx:id="loanManagementButton" text="Gestione Prestiti" styleClass="primary-button" />
     </HBox>
     
-    <Label text="Gestione Libreria" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Label text="Gestione Libreria" styleClass="header-label" />
 
-    <!-- GridPane per i libri -->
-    <TableView fx:id="bookTable" style="-fx-pref-width: 600;">
+    <!-- Tabella per i libri -->
+    <TableView fx:id="bookTable" VBox.vgrow="ALWAYS" styleClass="custom-table-view">
         <columns>
             <TableColumn fx:id="titleColumn" text="Titolo Libro" />
             <TableColumn fx:id="authorColumn" text="Autore" />
+            <TableColumn fx:id="editorColumn" text="Editore" />
             <TableColumn fx:id="quantityColumn" text="Quantità" />
         </columns>
     </TableView>
 
-
     <!-- Sezione di aggiunta -->
     <HBox spacing="10" alignment="CENTER">
-        <TextField fx:id="titleField" promptText="Titolo" />
-        <TextField fx:id="authorField" promptText="Autore" />
-        <TextField fx:id="quantityField" promptText="Quantità" />
-        <Button fx:id="addBookButton" text="Aggiungi Libro" />
+        <TextField fx:id="titleField" promptText="Titolo" styleClass="custom-text-field" />
+        <TextField fx:id="authorField" promptText="Autore" styleClass="custom-text-field" />
+        <TextField fx:id="editorField" promptText="Editore" styleClass="custom-text-field" />
+        <TextField fx:id="quantityField" promptText="Quantità" styleClass="custom-text-field" prefWidth="100" />
+        <Button fx:id="addBookButton" text="Aggiungi Libro" styleClass="primary-button" />
     </HBox>
 
     <!-- Campo filtro -->
-    <TextField fx:id="authorFilterField" promptText="Cerca libri per autore" style="-fx-pref-width: 400;" />
+    <TextField fx:id="authorFilterField" promptText="Cerca libri per autore" styleClass="custom-text-field" />
 
     <!-- Pulsante indietro -->
-    <Button fx:id="backButton" text="Indietro" />
+    <Button fx:id="backButton" text="Indietro" styleClass="secondary-button" />
 </VBox>

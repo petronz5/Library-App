@@ -66,12 +66,13 @@ public class App extends Application {
         adminStage.show();
     }
 
-    public static void showLoanManagementScreenWithBook(Book book) throws IOException {
+    public static void showLoanManagementScreenWithBook(Book book, User user) throws IOException {
         FXMLLoader loader = new FXMLLoader(App.class.getResource("/devatron/com/users_make_loan.fxml"));
         Parent root = loader.load();
 
         UserLoanController controller = loader.getController(); // Cambia LoanManagementController in UserLoanController
         controller.setBook(book);
+        controller.setCurrentUser (user); // Passa l'utente al controller
 
         Stage stage = new Stage();
         stage.setScene(new Scene(root));

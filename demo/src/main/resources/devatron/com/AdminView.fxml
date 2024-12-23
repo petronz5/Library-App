@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.AdminController" stylesheets="@styles.css">
-    <Label text="Richieste di Registrazione" style="-fx-font-size: 24; -fx-font-weight: bold;" />
-    <ListView fx:id="registrationRequestsList" style="-fx-pref-width: 300; -fx-pref-height: 200;" />
+<VBox alignment="CENTER" spacing="10" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.AdminController" stylesheets="@adminStyles.css" prefWidth="600" prefHeight="400">
+    <Label text="Richieste di Registrazione" styleClass="admin-header-label" />
+    <ListView fx:id="registrationRequestsList" VBox.vgrow="NEVER" styleClass="admin-list-view" prefHeight="400" />
     <HBox spacing="10" alignment="CENTER">
-        <Button fx:id="approveButton" text="Approva" />
-        <Button fx:id="rejectButton" text="Rifiuta" />
+        <Button fx:id="approveButton" text="Approva" styleClass="admin-small-button" />
+        <Button fx:id="rejectButton" text="Rifiuta" styleClass="admin-small-button" />
     </HBox>
 
-    <Label text="Utenti Registrati" style="-fx-font-size: 24; -fx-font-weight: bold;" />
-    <ListView fx:id="usersListView" style="-fx-pref-width: 300; -fx-pref-height: 200;" />
-    <Button fx:id="deleteUser" text="Elimina Utente" />
+    <Separator orientation="HORIZONTAL" />
+
+    <Label text="Utenti Registrati" styleClass="admin-header-label" />
+    <ListView fx:id="usersListView" VBox.vgrow="ALWAYS" styleClass="admin-list-view" />
+    <Button fx:id="deleteUser" text="Elimina Utente" styleClass="admin-small-button" />
 </VBox>
+
+

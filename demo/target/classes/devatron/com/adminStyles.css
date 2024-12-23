@@ -1,0 +1,37 @@
+/* Stile generale per AdminView */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: #f7f9fc;
+}
+
+/* Etichette di intestazione */
+.admin-header-label {
+    -fx-font-size: 20px; /* Dimensione ridotta */
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-padding: 5;
+}
+
+/* Liste */
+.admin-list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-font-size: 12px; /* Testo leggermente più piccolo */
+}
+
+/* Pulsanti */
+.admin-small-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 12px; /* Dimensione del testo ridotta */
+    -fx-font-weight: bold;
+    -fx-padding: 5 10;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.admin-small-button:hover {
+    -fx-background-color: #45a049;
+}
