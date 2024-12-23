@@ -31,16 +31,29 @@ public class LoginController {
         String password = passwordField.getText();
         User user = authenticate(username, password);
         
-        if (user != null) {
+        if (user == null) {
+            // Controlla se l'username esiste
+            if (usernameExists(username)) {
+                errorLabel.setText("Password non corretta.");
+            } else {
+                errorLabel.setText("Username non esistente.");
+            }
+            errorLabel.setVisible(true);
+        } else {
             // Autenticazione riuscita, mostra la schermata dei libri
             try {
                 App.showBookScreen(user);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            errorLabel.setText("Username o password errati.");
         }
+    }
+
+    private boolean usernameExists(String username) {
+        MongoDatabase database = DatabaseConnection.getDatabase();
+        MongoCollection<Document> users = database.getCollection("users");
+        Document userDoc = users.find(new Document("username", username)).first();
+        return userDoc != null;
     }
 
     public void onRegisterClick() {

@@ -34,6 +34,8 @@ public class UserLoanController {
     private Button confirmLoanButton;
     @FXML
     private Button backButton;
+    @FXML
+    private Label errorLabel;
 
     private Book selectedBook; // Assicurati di impostare questo valore quando apri la schermata
 
@@ -41,14 +43,32 @@ public class UserLoanController {
 
     private User currentUser;
 
-/*************  ✨ Codeium Command ⭐  *************/
-/**
- * Sets the selected book and updates the book title field.
- *
- * @param book the Book object to be set as selected
- */
+    @FXML
+    public void initialize() {
+        // Altre inizializzazioni...
 
-/******  f3849d69-acdd-4235-aad8-226c0fc0dcd1  *******/
+        // Aggiungi un listener per il campo del numero di telefono
+        phoneNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Controlla se il nuovo valore è composto solo da cifre
+            if (!newValue.matches("\\d*")) {
+                phoneNumberField.setText(newValue.replaceAll("[^\\d]", "")); // Rimuovi caratteri non numerici
+            }
+
+            // Controlla la lunghezza del numero di telefono
+            if (newValue.length() > 10) {
+                phoneNumberField.setText(newValue.substring(0, 10)); // Limita a 10 cifre
+            }
+
+            // Mostra un messaggio di errore se la lunghezza non è valida
+            if (newValue.length() < 9) {
+                errorLabel.setText("Il numero di telefono deve avere tra 9 e 10 cifre.");
+                errorLabel.setVisible(true);
+            } else {
+                errorLabel.setVisible(false); // Nascondi il messaggio di errore se la lunghezza è valida
+            }
+        });
+    }
+
     public void setBook(Book book) {
         this.selectedBook = book;
         bookTitleField.setText(selectedBook.getTitle());
@@ -98,11 +118,21 @@ public class UserLoanController {
     }
 
     private boolean validateUserInput() {
-        return !usernameField.getText().isEmpty() &&
-               !firstNameField.getText().isEmpty() &&
-               !lastNameField.getText().isEmpty() &&
-               !emailField.getText().isEmpty() &&
-               !phoneNumberField.getText().isEmpty();
+        boolean isValid =   !usernameField.getText().isEmpty() &&
+                            !firstNameField.getText().isEmpty() &&
+                            !lastNameField.getText().isEmpty() &&
+                            !emailField.getText().isEmpty() &&
+                            !phoneNumberField.getText().isEmpty();
+        
+        String phoneNumber = phoneNumberField.getText();
+        if (phoneNumber.length() < 9 || phoneNumber.length() > 10) {
+            errorLabel.setText("Il numero di telefono deve avere tra 9 e 10 cifre.");
+            errorLabel.setVisible(true);
+            isValid = false;
+        } else {
+            errorLabel.setVisible(false);
+        }
+        return isValid;
     }
 
     public void setCurrentUser(User user) {

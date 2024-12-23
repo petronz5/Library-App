@@ -45,6 +45,8 @@ public class App extends Application {
         // Usa primaryStage per impostare la nuova scena
         primaryStage.setScene(new Scene(root));
         primaryStage.setTitle("Book List");
+
+        primaryStage.centerOnScreen();
         primaryStage.show();
     }
 

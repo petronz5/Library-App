@@ -17,6 +17,7 @@
         <TextField fx:id="lastNameField" promptText="Cognome" styleClass="custom-text-field" />
         <TextField fx:id="emailField" promptText="Email" styleClass="custom-text-field" />
         <TextField fx:id="phoneNumberField" promptText="Numero di Telefono" styleClass="custom-text-field" />
+        <Label fx:id="errorLabel" textFill="red" visible="false" /> <!-- Etichetta per errori -->
     </VBox>
 
     <!-- Pulsanti -->

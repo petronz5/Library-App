@@ -34,7 +34,7 @@
 
 /* Campi di testo */
 .custom-text-field {
-    -fx-pref-width: 350;
+    -fx-pref-width: 250;
     -fx-background-color: #ffffff;
     -fx-border-color: #ccc;
     -fx-border-radius: 5;
@@ -116,3 +116,32 @@
     -fx-pref-width: 100;
 }
 
+/* Ridimensiona i campi di testo della sezione aggiunta libri */
+#titleField, #authorField, #editorField {
+    -fx-pref-width: 150; /* Riduci la larghezza */
+}
+
+#quantityField {
+    -fx-pref-width: 80; /* Larghezza più piccola per il campo Quantità */
+}
+
+/* Margine o padding personalizzato per i filtri */
+.filter-pane {
+    -fx-background-color: #eaeaea;
+    -fx-padding: 40 20 20 20; /* Sposta i filtri più in basso aumentando il padding superiore */
+}
+
+.filter-header-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.custom-text-field {
+    -fx-padding: 5;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-background-color: white;
+}
