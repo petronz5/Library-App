@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.LoanManagementController" stylesheets="@styles.css">
+    <Label text="Gestione Prestiti" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+    <TableView fx:id="loanTable" style="-fx-pref-width: 600; -fx-pref-height: 400;">
+        <columns>
+            <TableColumn fx:id="bookTitleColumn" text="Titolo Libro" />
+            <TableColumn fx:id="usernameColumn" text="Nome Utente" />
+            <TableColumn fx:id="firstNameColumn" text="Nome" />
+            <TableColumn fx:id="lastNameColumn" text="Cognome" />
+            <TableColumn fx:id="emailColumn" text="Email" />
+            <TableColumn fx:id="phoneNumberColumn" text="Numero di Telefono" />
+            <TableColumn fx:id="loanDateColumn" text="Data Prestito" />
+            <TableColumn fx:id="returnDateColumn" text="Data Restituzione" />
+        </columns>
+    </TableView>
+    <Button fx:id="backButton" text="Indietro" onAction='#handleBack'/>
+</VBox>

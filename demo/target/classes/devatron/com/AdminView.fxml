@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.AdminController" stylesheets="@styles.css">
+    <Label text="Richieste di Registrazione" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+    <ListView fx:id="registrationRequestsList" style="-fx-pref-width: 300; -fx-pref-height: 200;" />
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="approveButton" text="Approva" />
+        <Button fx:id="rejectButton" text="Rifiuta" />
+    </HBox>
+
+    <Label text="Utenti Registrati" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+    <ListView fx:id="usersListView" style="-fx-pref-width: 300; -fx-pref-height: 200;" />
+    <Button fx:id="deleteUser" text="Elimina Utente" />
+</VBox>

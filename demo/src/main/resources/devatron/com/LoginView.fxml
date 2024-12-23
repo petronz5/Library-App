@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.LoginController" stylesheets="@styles.css">
+    <Label text="Login" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+    <TextField fx:id="usernameField" promptText="Username" style="-fx-pref-width: 300;" />
+    <PasswordField fx:id="passwordField" promptText="Password" style="-fx-pref-width: 300;" />
+    <Button text="Login" onAction="#onLoginClick" style="-fx-pref-width: 100;" />
+    <Label fx:id="errorLabel" textFill="red" />
+
+    <Label text="Non hai un account? Registrati qui:" />
+    <TextField fx:id="registerUsernameField" promptText="Nome" style="-fx-pref-width: 300;" />
+    <PasswordField fx:id="registerPasswordField" promptText="Password" style="-fx-pref-width: 300;" />
+    <Button text="Registrati" onAction="#onRegisterClick" style="-fx-pref-width: 100;" />
+</VBox>

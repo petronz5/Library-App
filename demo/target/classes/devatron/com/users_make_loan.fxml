@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+
+<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.UserLoanController" stylesheets="@styles.css">
+    <Label text="Gestione Prestiti" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+    <TableView fx:id="loanTable" style="-fx-pref-width: 600; -fx-pref-height: 400;">
+        <columns>
+            <TableColumn fx:id="bookTitleColumn" text="Titolo Libro" />
+            <TableColumn fx:id="usernameColumn" text="Nome Utente" />
+            <TableColumn fx:id="firstNameColumn" text="Nome" />
+            <TableColumn fx:id="lastNameColumn" text="Cognome" />
+            <TableColumn fx:id="emailColumn" text="Email" />
+            <TableColumn fx:id="phoneNumberColumn" text="Telefono" />
+            <TableColumn fx:id="loanDateColumn" text="Data Prestito" />
+            <TableColumn fx:id="returnDateColumn" text="Data Restituzione" />
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER" spacing="10">
+        <Label text="Utente:" />
+        <TextField fx:id="usernameField" promptText="Nome utente" />
+        <Label text="Nome:" />
+        <TextField fx:id="firstNameField" promptText="Nome" />
+        <Label text="Cognome:" />
+        <TextField fx:id="lastNameField" promptText="Cognome" />
+        <Label text="Email:" />
+        <TextField fx:id="emailField" promptText="Email" />
+        <Label text="Telefono:" />
+        <TextField fx:id="phoneNumberField" promptText="Telefono" />
+        <Button text="Conferma Prestito" fx:id="confirmLoanButton" onAction="#confirmLoan" />
+    </HBox>
+
+    <Button fx:id="backButton" text="Indietro" onAction="#handleBack" />
+</VBox>
