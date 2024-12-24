@@ -95,10 +95,12 @@ public class UserLoanController {
         try {
             MongoDatabase database = DatabaseConnection.getDatabase();
             MongoCollection<Document> loans = database.getCollection("loans");
+            MongoCollection<Document> booksCollection = database.getCollection("books");
 
             LocalDate loanDate = LocalDate.now();
             LocalDate returnDate = loanDate.plusDays(30); // Imposta la returnDate a 30 giorni dopo la loanDate
 
+            // Aggiungi il prestito nella collezione "loans"
             Document newLoan = new Document("bookTitle", selectedBook.getTitle())
                     .append("username", currentUser.getUsername())
                     .append("firstName", firstName)
@@ -109,6 +111,12 @@ public class UserLoanController {
                     .append("returnDate", returnDate.format(dateFormatter));
 
             loans.insertOne(newLoan);
+
+            // Decrementa il campo "availableQuantity" nel libro
+            Document filter = new Document("title", selectedBook.getTitle());
+            Document update = new Document("$inc", new Document("availableQuantity", -1));
+            booksCollection.updateOne(filter, update);
+
             System.out.println("Prestito confermato: " + selectedBook.getTitle() + " a " + username);
             handleBack(); 
         } catch (Exception e) {
@@ -116,6 +124,8 @@ public class UserLoanController {
             System.err.println("Errore durante la conferma del prestito: " + e.getMessage());
         }
     }
+
+    
 
     private boolean validateUserInput() {
         boolean isValid =   !usernameField.getText().isEmpty() &&
