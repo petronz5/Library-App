@@ -1,63 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.*?>
 
-<SplitPane xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.BookController" orientation="HORIZONTAL" dividerPositions="0.2" prefWidth="1400" prefHeight="1000" minWidth="900"
-    minHeight="700" stylesheets="@styles.css">
-    <!-- Pannello laterale per i filtri -->
-    <TitledPane fx:id="filterPane" text="Filtri" collapsible="true" expanded="false" maxWidth="300" minWidth="150" VBox.vgrow="NEVER">
-        <VBox alignment="TOP_CENTER" spacing="15" styleClass="filter-pane" maxWidth="300">
-            <Label text="Filtri" styleClass="filter-header-label" />
-            <TextField fx:id="titleFilterField" promptText="Filtra per Titolo" styleClass="custom-text-field" />
-            <TextField fx:id="authorFilterField" promptText="Filtra per Autore" styleClass="custom-text-field" />
-            <TextField fx:id="editorFilterField" promptText="Filtra per Editore" styleClass="custom-text-field" />
-            <TextField fx:id="genreFilterField" promptText="Filtra per Genere" styleClass="custom-text-field" />
-            <TextField fx:id="priceFilterField" promptText="Filtra per Prezzo (€)" styleClass="custom-text-field" />
-        </VBox>
-    </TitledPane>
-
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.BookController" prefWidth="1400" prefHeight="1000" minWidth="900" minHeight="700" stylesheets="@styles.css">
     <!-- Contenitore principale -->
-    <VBox alignment="TOP_CENTER" spacing="15" VBox.vgrow="ALWAYS" style="-fx-background-color: #f5f5f5;">
-        <!-- Barra superiore -->
-        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="header-container">
-            <Button fx:id="backButton" text="← Indietro" styleClass="secondary-button" alignment="CENTER_LEFT" />
-            <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="adminButton" text="Area Amministrativa" styleClass="primary-button" />
-            <Button fx:id="loanManagementButton" text="Gestione Prestiti" styleClass="primary-button" />
-        </HBox>
-        
-        <Label text="Gestione Libreria" styleClass="header-label" />
+    <HBox>
+        <!-- Contenitore per il pulsante e il pannello dei filtri -->
+        <StackPane fx:id="filterPaneStack" minWidth="10" maxWidth="300">
+            <!-- Pannello dei filtri -->
+            <VBox fx:id="filterPane" alignment="TOP_CENTER" spacing="15" styleClass="filter-pane" maxWidth="300" minWidth="2" visible="true">
+                <Label text="Filtri" styleClass="filter-header-label" />
+                <TextField fx:id="titleFilterField" promptText="Titolo" styleClass="custom-text-field" />
+                <TextField fx:id="authorFilterField" promptText="Autore" styleClass="custom-text-field" />
+                <TextField fx:id="editorFilterField" promptText="Editore" styleClass="custom-text-field" />
+                <TextField fx:id="genreFilterField" promptText="Genere" styleClass="custom-text-field" />
+                <TextField fx:id="priceFilterField" promptText="Prezzo (€)" styleClass="custom-text-field" />
+            </VBox>
 
-        <!-- Tabella per i libri -->
-        <TableView fx:id="bookTable" VBox.vgrow="ALWAYS" styleClass="custom-table-view">
-            <columns>
-                <TableColumn fx:id="titleColumn" text="Titolo Libro" />
-                <TableColumn fx:id="authorColumn" text="Autore" />
-                <TableColumn fx:id="editorColumn" text="Editore" />
-                <TableColumn fx:id="quantityColumn" text="Quantità Totale" />
-                <TableColumn fx:id="availableQuantityColumn" text="Quantità Disponibile" />
-                <TableColumn fx:id="genreColumn" text="Genere" />
-                <TableColumn fx:id="priceColumn" text="Prezzo (€)" />
-                <TableColumn fx:id="isbnColumn" text="ISBN" />
-                <TableColumn fx:id="publishYearColumn" text="Anno di Pubblicazione" />
-            </columns>
-        </TableView>
+            <!-- Bottone per il toggle posizionato sul lato destro -->
+            <Button fx:id="toggleFilterButton" text="►" onAction="#toggleFilterPane" styleClass="third-button"
+                    StackPane.alignment="CENTER_RIGHT" />
+        </StackPane>
 
-        <!-- Sezione di aggiunta libri con ScrollPane -->
-        <ScrollPane fitToWidth="true" style="-fx-padding: 10;">
-            <GridPane alignment="CENTER" hgap="10" vgap="10">
-                <TextField fx:id="titleField" promptText="Titolo" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <TextField fx:id="authorField" promptText="Autore" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <TextField fx:id="editorField" promptText="Editore" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <TextField fx:id="quantityField" promptText="Quantità Totale" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <TextField fx:id="availableQuantityField" promptText="Quantità Disponibile" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <TextField fx:id="genreField" promptText="Genere" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <TextField fx:id="priceField" promptText="Prezzo (€)" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                <TextField fx:id="isbnField" promptText="ISBN" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <TextField fx:id="publishYearField" promptText="Anno di Pubblicazione" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                <Button fx:id="addBookButton" text="Aggiungi Libro" styleClass="primary-button" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            </GridPane>
-        </ScrollPane>
-    </VBox>
-</SplitPane>
+        <!-- Contenitore per il resto dell'interfaccia -->
+        <VBox alignment="TOP_CENTER" spacing="15" VBox.vgrow="ALWAYS" style="-fx-background-color: #f5f5f5;">
+            <!-- Barra superiore -->
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="header-container">
+                <Button fx:id="backButton" text="← Indietro" styleClass="secondary-button" alignment="CENTER_LEFT" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="adminButton" text="Area Amministrativa" styleClass="primary-button" />
+                <Button fx:id="loanManagementButton" text="Gestione Prestiti" styleClass="primary-button" />
+            </HBox>
+
+            <Label text="Gestione Libreria" styleClass="header-label" />
+
+            <!-- Tabella per i libri -->
+            <TableView fx:id="bookTable" VBox.vgrow="ALWAYS" styleClass="custom-table-view">
+                <columns>
+                    <TableColumn fx:id="titleColumn" text="Titolo Libro" />
+                    <TableColumn fx:id="authorColumn" text="Autore" />
+                    <TableColumn fx:id="editorColumn" text="Editore" />
+                    <TableColumn fx:id="quantityColumn" text="Quantità Totale" />
+                    <TableColumn fx:id="availableQuantityColumn" text="Quantità Disponibile" />
+                    <TableColumn fx:id="genreColumn" text="Genere" />
+                    <TableColumn fx:id="priceColumn" text="Prezzo (€)" />
+                    <TableColumn fx:id="isbnColumn" text="ISBN" />
+                    <TableColumn fx:id="publishYearColumn" text="Anno di Pubblicazione" />
+                </columns>
+            </TableView>
+
+            <!-- Sezione di aggiunta libri -->
+            <ScrollPane fitToWidth="true" style="-fx-padding: 10;">
+                <GridPane alignment="CENTER" hgap="10" vgap="10">
+                    <TextField fx:id="titleField" promptText="Titolo" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField fx:id="authorField" promptText="Autore" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="editorField" promptText="Editore" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="quantityField" promptText="Quantità Totale" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <TextField fx:id="availableQuantityField" promptText="Quantità Disponibile" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <TextField fx:id="genreField" promptText="Genere" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <TextField fx:id="priceField" promptText="Prezzo (€)" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <TextField fx:id="isbnField" promptText="ISBN" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <TextField fx:id="publishYearField" promptText="Anno di Pubblicazione" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <Button fx:id="addBookButton" text="Aggiungi Libro" styleClass="primary-button" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                </GridPane>
+            </ScrollPane>
+        </VBox>
+    </HBox>
+</StackPane>

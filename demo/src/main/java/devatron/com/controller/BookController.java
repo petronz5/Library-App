@@ -6,14 +6,19 @@ import devatron.com.App;
 import devatron.com.database.DatabaseConnection;
 import devatron.com.model.Book;
 import devatron.com.model.User;
+import javafx.animation.Transition;
+import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import org.bson.Document;
 
@@ -60,6 +65,39 @@ public class BookController {
 
     private ObservableList<Book> books = FXCollections.observableArrayList();
 
+    private ContextMenu bookContextMenu;
+
+    @FXML
+    private VBox filterPane;
+
+    @FXML
+    private Button toggleFilterButton;
+
+    private boolean isFilterPaneExpanded = false;
+
+    @FXML
+    private void toggleFilterPane() {
+        if (isFilterPaneExpanded) {
+            collapseFilterPane(); // Riduci la larghezza
+        } else {
+            expandFilterPane(); // Espandi la larghezza
+        }
+        isFilterPaneExpanded = !isFilterPaneExpanded;
+    }
+
+    private void expandFilterPane() {
+        filterPane.setPrefWidth(250); // Imposta larghezza espansa
+        toggleFilterButton.setText("◄");
+        filterPane.applyCss();
+        filterPane.layout();
+    }
+
+    private void collapseFilterPane() {
+        filterPane.setPrefWidth(30); // Imposta larghezza ridotta
+        toggleFilterButton.setText("►");
+        filterPane.applyCss();
+        filterPane.layout();
+    }
 
     @FXML
     public void initialize() {
@@ -76,30 +114,55 @@ public class BookController {
         publishYearColumn.setCellValueFactory(new PropertyValueFactory<>("publicationYear"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
+        collapseFilterPane();
+
         // Load books into the ObservableList
         books.setAll(getBooks());
         bookTable.setItems(books);
 
         configureTableColumns();
+        createBookContextMenu();
 
-        // Add filtering functionality
+        // Configura le azioni per il TableView
+        bookTable.setRowFactory(tv -> {
+            TableRow<Book> row = new TableRow<>();
+
+            // Doppio clic con il tasto sinistro per aprire Gestione Prestiti
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY && !row.isEmpty()) {
+                    Book selectedBook = row.getItem();
+                    openLoanManagementForBook(selectedBook); // Schermata gestione prestiti
+                } else if (event.getButton() == MouseButton.SECONDARY && !row.isEmpty()) {
+                    // Clic destro per aprire il menu contestuale
+                    Book selectedBook = row.getItem();
+                    bookTable.getSelectionModel().select(selectedBook);
+                    bookContextMenu.show(row, event.getScreenX(), event.getScreenY());
+                } else {
+                    // Nascondi il menu se clicchi fuori
+                    bookContextMenu.hide();
+                }
+            });
+
+            return row;
+        });
+
+        // Filtri
         titleFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         authorFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         editorFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         genreFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         priceFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
 
-        // Event listeners for buttons and actions
+        // Eventi per i pulsanti
         backButton.setOnAction(event -> backButtonAction());
         addBookButton.setOnAction(event -> addBook());
         adminButton.setOnAction(event -> onAdminAreaButtonClick());
         loanManagementButton.setOnAction(event -> onLoanManagementButtonClick());
 
-
-        // Aggiungi dei listener per controllare che gli input siano validi
+        // Validazioni
         quantityField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) { // Controlla se il nuovo valore è composto solo da cifre
-                quantityField.setText(newValue.replaceAll("[^\\d]", "")); 
+            if (!newValue.matches("\\d*")) {
+                quantityField.setText(newValue.replaceAll("[^\\d]", ""));
             }
         });
 
@@ -108,44 +171,45 @@ public class BookController {
                 availableQuantityField.setText(newValue.replaceAll("[^\\d]", ""));
             }
         });
-        
+
         priceField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*(\\.\\d{0,2})?")) {
-                priceField.setText(oldValue); 
+                priceField.setText(oldValue);
             }
-        });
-        
-        publishYearField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                publishYearField.setText(newValue.replaceAll("[^\\d]", "")); 
-            }
-        });
-    
-        // Row double-click event
-        bookTable.setRowFactory(tv -> {
-            TableRow<Book> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    Book selectedBook = row.getItem();
-                    openLoanManagementForBook(selectedBook);
-                }
-            });
-            return row;
         });
 
-        // Handle key press event for the table
-        bookTable.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.M) {
-                Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
-                if (selectedBook != null) {
-                    editBookDetails(selectedBook);
-                } else {
-                    System.out.println("No book selected for editing.");
-                }
+        publishYearField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                publishYearField.setText(newValue.replaceAll("[^\\d]", ""));
             }
         });
     }
 
+    private void createBookContextMenu() {
+        bookContextMenu = new ContextMenu();
+
+        MenuItem editMenuItem = new MenuItem("Modifica");
+        editMenuItem.setOnAction(event -> {
+            Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
+            if (selectedBook != null) {
+                editBookDetails(selectedBook);
+            } else {
+                System.out.println("No book selected for editing.");
+            }
+        });
+
+        MenuItem deleteMenuItem = new MenuItem("Cancella");
+        deleteMenuItem.setOnAction(event -> {
+            Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
+            if (selectedBook != null) {
+                deleteBook(selectedBook);
+            } else {
+                System.out.println("No book selected for deletion.");
+            }
+        });
+
+        bookContextMenu.getItems().addAll(editMenuItem, deleteMenuItem);
+    }
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
@@ -154,8 +218,6 @@ public class BookController {
         adminButton.setVisible(isAdmin);
         System.out.println("Set current user: " + user.getUsername() + " (Role: " + user.getRole() + ")");
     }
-
-
 
     @FXML
     private void onAdminAreaButtonClick() {
@@ -190,15 +252,57 @@ public class BookController {
         }
     }
 
-
     private void configureTableColumns() {
-        TableView<Book> bookTable = this.bookTable;
+        bookTable.getColumns().clear();
 
-        for (TableColumn<Book, ?> column : bookTable.getColumns()) {
-            column.prefWidthProperty().bind(
-                bookTable.widthProperty().multiply(1.0 / bookTable.getColumns().size()) // Divide equamente la larghezza
-            );
-        }
+        double totalWidth = bookTable.getWidth();
+
+        TableColumn<Book, String> titleColumn = new TableColumn<>("Titolo Libro");
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        titleColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.2)); // 20% della tabella
+
+        TableColumn<Book, String> authorColumn = new TableColumn<>("Autore");
+        authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+        authorColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.15)); // 15% della tabella
+
+        TableColumn<Book, String> editorColumn = new TableColumn<>("Editore");
+        editorColumn.setCellValueFactory(new PropertyValueFactory<>("editor"));
+        editorColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.1)); // 10% della tabella
+
+        TableColumn<Book, String> isbnColumn = new TableColumn<>("ISBN");
+        isbnColumn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+        isbnColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.1)); // 15% della tabella
+
+        TableColumn<Book, Integer> quantityColumn = new TableColumn<>("Q. Totale");
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        quantityColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.1)); // 5% della tabella
+
+        TableColumn<Book, Integer> availableQuantityColumn = new TableColumn<>("Q. Disponibile");
+        availableQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("availableQuantity"));
+        availableQuantityColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.1)); // 5% della tabella
+
+        TableColumn<Book, String> genreColumn = new TableColumn<>("Genere");
+        genreColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
+        genreColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.1)); // 5% della tabella
+
+        TableColumn<Book, Double> priceColumn = new TableColumn<>("Prezzo (€)");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.1)); // 10% della tabella
+
+        TableColumn<Book, Integer> publishYearColumn = new TableColumn<>("Anno");
+        publishYearColumn.setCellValueFactory(new PropertyValueFactory<>("publicationYear"));
+        publishYearColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.05)); // 10% della tabella
+
+        bookTable.getColumns().addAll(
+                titleColumn,
+                authorColumn,
+                isbnColumn,
+                quantityColumn,
+                availableQuantityColumn,
+                genreColumn,
+                priceColumn,
+                editorColumn,
+                publishYearColumn);
     }
 
     private void applyFilters() {
@@ -208,16 +312,14 @@ public class BookController {
         String genreFilter = genreFilterField.getText().toLowerCase();
         String priceFilter = priceFilterField.getText().toLowerCase();
 
-        double minPrice = 0.0;
-    
         List<Book> filteredBooks = books.stream()
                 .filter(book -> book.getTitle().toLowerCase().contains(titleFilter))
                 .filter(book -> book.getAuthor().toLowerCase().contains(authorFilter))
                 .filter(book -> book.getEditor().toLowerCase().contains(editorFilter))
                 .filter(book -> book.getGenre().toLowerCase().contains(genreFilter))
-                .filter(book -> book.getPrice() >= minPrice)
+                .filter(book -> book.getPrice() >= Double.parseDouble(priceFilter))
                 .collect(Collectors.toList());
-    
+
         bookTable.setItems(FXCollections.observableArrayList(filteredBooks));
     }
 
@@ -246,7 +348,6 @@ public class BookController {
         TextField isbnField = new TextField(book.getIsbn());
         TextField publishYearField = new TextField(String.valueOf(book.getPublicationYear()));
 
-
         // Add inputs to the grid
         grid.add(new Label("Titolo:"), 0, 0);
         grid.add(titleField, 1, 0);
@@ -274,15 +375,15 @@ public class BookController {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 return List.of(
-                    titleField.getText(),
-                    authorField.getText(),
-                    editorField.getText(),
-                    quantityField.getText(),
-                    availableQuantityField.getText(),
-                    genreField.getText(),
-                    priceField.getText(),
-                    isbnField.getText(),
-                    publishYearField.getText()
+                        titleField.getText(),
+                        authorField.getText(),
+                        editorField.getText(),
+                        quantityField.getText(),
+                        availableQuantityField.getText(),
+                        genreField.getText(),
+                        priceField.getText(),
+                        isbnField.getText(),
+                        publishYearField.getText()
 
                 );
             }
@@ -300,7 +401,6 @@ public class BookController {
                 double newPrice = Double.parseDouble(result.get(6));
                 String newIsbn = isbnField.getText();
                 int newPublishYear = Integer.parseInt(result.get(8));
-                
 
                 // Update in the database
                 MongoDatabase database = DatabaseConnection.getDatabase();
@@ -308,14 +408,14 @@ public class BookController {
 
                 Document filter = new Document("title", book.getTitle());
                 Document update = new Document("$set", new Document("title", newTitle)
-                    .append("author", newAuthor)
-                    .append("editor", newEditor)
-                    .append("quantity", newQuantity)
-                    .append("availableQuantity", newAvailableQuantity)
-                    .append("genre", newGenre)
-                    .append("price", newPrice)
-                    .append("isbn", newIsbn)
-                    .append("publishYear", newPublishYear));
+                        .append("author", newAuthor)
+                        .append("editor", newEditor)
+                        .append("quantity", newQuantity)
+                        .append("availableQuantity", newAvailableQuantity)
+                        .append("genre", newGenre)
+                        .append("price", newPrice)
+                        .append("isbn", newIsbn)
+                        .append("publishYear", newPublishYear));
                 booksCollection.updateOne(filter, update);
 
                 // Refresh the table
@@ -328,6 +428,18 @@ public class BookController {
         });
     }
 
+    private void deleteBook(Book book) {
+        try {
+            System.out.println("Deleting book: " + book.getTitle());
+            MongoDatabase database = DatabaseConnection.getDatabase();
+            MongoCollection<Document> booksCollection = database.getCollection("books");
+            booksCollection.deleteOne(new Document("title", book.getTitle()));
+            books.setAll(getBooks());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error deleting book: " + e.getMessage());
+        }
+    }
 
     private void openLoanManagementForBook(Book book) {
         try {
@@ -338,14 +450,13 @@ public class BookController {
             System.err.println("Error opening loan management: " + e.getMessage());
         }
     }
-    
 
     private List<Book> getBooks() {
         try {
             System.out.println("Fetching books from the database...");
             MongoDatabase database = DatabaseConnection.getDatabase();
             MongoCollection<Document> booksCollection = database.getCollection("books");
-    
+
             List<Book> bookList = new ArrayList<>();
             for (Document doc : booksCollection.find()) {
                 String title = doc.getString("title");
@@ -357,12 +468,13 @@ public class BookController {
                 String isbn = doc.getString("isbn");
                 int publishYear = doc.getInteger("publishYear", 0); // Default to 0 if null
                 double price = doc.containsKey("price") && doc.get("price") != null
-                    ? ((Number) doc.get("price")).doubleValue()
-                    : 0.0;
-    
-                bookList.add(new Book(title, author, quantity, availableQuantity, editor, genre, price, publishYear, isbn));
+                        ? ((Number) doc.get("price")).doubleValue()
+                        : 0.0;
+
+                bookList.add(
+                        new Book(title, author, quantity, availableQuantity, editor, genre, price, publishYear, isbn));
             }
-    
+
             System.out.println("Total books retrieved: " + bookList.size());
             return bookList;
         } catch (Exception e) {
@@ -371,23 +483,22 @@ public class BookController {
             return new ArrayList<>(); // Return empty list on error
         }
     }
-    
 
     private void addBook() {
         String title = titleField.getText();
-            String author = authorField.getText();
-            String editor = editorField.getText();
-            String genre = genreField.getText();
-            String isbn = isbnField.getText();
-            int quantity = Integer.parseInt(quantityField.getText());
-            int availableQuantity = Integer.parseInt(availableQuantityField.getText());
-            int publishYear = Integer.parseInt(publishYearField.getText());
-            double price = Double.parseDouble(priceField.getText());
+        String author = authorField.getText();
+        String editor = editorField.getText();
+        String genre = genreField.getText();
+        String isbn = isbnField.getText();
+        int quantity = Integer.parseInt(quantityField.getText());
+        int availableQuantity = Integer.parseInt(availableQuantityField.getText());
+        int publishYear = Integer.parseInt(publishYearField.getText());
+        double price = Double.parseDouble(priceField.getText());
 
-        if (title.isEmpty() || author.isEmpty() || editor.isEmpty() || 
-            genre.isEmpty() || isbn.isEmpty() || quantityField.getText().isEmpty() ||
-            availableQuantityField.getText().isEmpty() || publishYearField.getText().isEmpty() ||
-            priceField.getText().isEmpty()) {
+        if (title.isEmpty() || author.isEmpty() || editor.isEmpty() ||
+                genre.isEmpty() || isbn.isEmpty() || quantityField.getText().isEmpty() ||
+                availableQuantityField.getText().isEmpty() || publishYearField.getText().isEmpty() ||
+                priceField.getText().isEmpty()) {
             showAlert("Errore", "Tutti i campi devono essere compilati.");
             return;
         }
@@ -404,30 +515,31 @@ public class BookController {
                 showAlert("Errore", "La quantità non può essere negativa.");
                 return;
             }
-    
+
             // Validazione e conversione della quantità disponibile
             availableQuantity = Integer.parseInt(availableQuantityField.getText());
             if (availableQuantity < 0 || availableQuantity > quantity) {
                 showAlert("Errore", "La quantità disponibile deve essere compresa tra 0 e la quantità totale.");
                 return;
             }
-    
+
             // Validazione e conversione dell'anno di pubblicazione
             publishYear = Integer.parseInt(publishYearField.getText());
             if (publishYear < 1000 || publishYear > 9999) { // Limiti ragionevoli per un anno
                 showAlert("Errore", "L'anno di pubblicazione deve essere un valore valido (ad esempio, 2024).");
                 return;
             }
-    
+
             // Validazione e conversione del prezzo
             price = Double.parseDouble(priceField.getText());
             if (price < 0) {
                 showAlert("Errore", "Il prezzo non può essere negativo.");
                 return;
             }
-    
+
         } catch (NumberFormatException e) {
-            showAlert("Errore", "Quantità, quantità disponibile, anno di pubblicazione e prezzo devono essere valori numerici validi.");
+            showAlert("Errore",
+                    "Quantità, quantità disponibile, anno di pubblicazione e prezzo devono essere valori numerici validi.");
             return;
         }
 
@@ -464,7 +576,6 @@ public class BookController {
         }
     }
 
-
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -472,6 +583,5 @@ public class BookController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
 
 }

@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 
-
 import java.io.IOException;
 
 public class App extends Application {
@@ -33,6 +32,7 @@ public class App extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         primaryStage.setTitle("Login");
         primaryStage.setScene(scene);
+        primaryStage.centerOnScreen();
         primaryStage.show();
     }
 
@@ -40,8 +40,8 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(App.class.getResource("/devatron/com/BookView.fxml"));
         Parent root = loader.load();
         BookController controller = loader.getController();
-        controller.setCurrentUser (user); // Passa l'utente al controller
-    
+        controller.setCurrentUser(user); // Passa l'utente al controller
+
         // Usa primaryStage per impostare la nuova scena
         primaryStage.setScene(new Scene(root));
         primaryStage.setTitle("Book List");
@@ -74,14 +74,13 @@ public class App extends Application {
 
         UserLoanController controller = loader.getController(); // Cambia LoanManagementController in UserLoanController
         controller.setBook(book);
-        controller.setCurrentUser (user); // Passa l'utente al controller
+        controller.setCurrentUser(user); // Passa l'utente al controller
 
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.setTitle("Loan Management");
         stage.show();
     }
-
 
     public static void main(String[] args) {
         launch();

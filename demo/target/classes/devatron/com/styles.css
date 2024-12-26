@@ -72,6 +72,14 @@
     -fx-background-radius: 5;
 }
 
+.third-button {
+    -fx-background-color: #e7e7e7; /* Grigio chiaro */
+    -fx-text-fill: #333;
+    -fx-padding: 5 10;
+    -fx-font-size: 10px;
+    -fx-border-radius: 5;
+}
+
 .secondary-button:hover {
     -fx-background-color: #d6d6d6; /* Grigio più scuro */
 }

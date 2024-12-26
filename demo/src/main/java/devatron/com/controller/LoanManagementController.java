@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 
 import org.bson.Document;
@@ -59,6 +60,8 @@ public class LoanManagementController {
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    private ContextMenu loanContextMenu;
+
     /**
      * Configura la tabella dei prestiti con le colonne desiderate e carica i dati
      * presenti nel database. Configura inoltre il pulsante "Indietro" per tornare
@@ -81,6 +84,19 @@ public class LoanManagementController {
         // Configura il pulsante "Indietro"
         backButton.setOnAction(event -> handleBack());
 
+        contextMenuLoan();
+        loanTable.setRowFactory(event -> {
+            TableRow<Loan> row = new TableRow<>();
+            row.setOnMouseClicked(event1 -> {
+                if (event1.getButton() == MouseButton.SECONDARY && !row.isEmpty()) {
+                    Loan loan = row.getItem();
+                    loanTable.getSelectionModel().select(loan);
+                    loanContextMenu.show(loanTable, event1.getScreenX(), event1.getScreenY());
+                }
+            });
+            return row;
+        });
+
         loanTable.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.DELETE) {
                 Loan selectedLoan = loanTable.getSelectionModel().getSelectedItem();
@@ -89,6 +105,22 @@ public class LoanManagementController {
                 }
             }
         });
+    }
+
+    private void contextMenuLoan() {
+        // Creazione del menu contestuale
+        loanContextMenu = new ContextMenu();
+
+        // Creazione delle opzioni del menu contestuale
+        MenuItem deleteItem = new MenuItem("Delete");
+        deleteItem.setOnAction(event -> {
+            Loan selectedLoan = loanTable.getSelectionModel().getSelectedItem();
+            if (selectedLoan != null) {
+                deleteLoan(selectedLoan);
+            }
+        });
+
+        loanContextMenu.getItems().addAll(deleteItem);
     }
 
     private ObservableList<Loan> getLoans() {
@@ -116,17 +148,51 @@ public class LoanManagementController {
                 try {
                     returnDate = LocalDate.parse(doc.getString("returnDate"), dateFormatter);
                 } catch (Exception e) {
-                    returnDate = LocalDate.parse(doc.getString("returnDate"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    returnDate = LocalDate.parse(doc.getString("returnDate"),
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                 }
             }
 
-            loanList.add(new Loan(bookTitle, username ,firstName, lastName, email, phoneNumber, loanDate, returnDate));
+            loanList.add(new Loan(bookTitle, username, firstName, lastName, email, phoneNumber, loanDate, returnDate));
         }
 
         return FXCollections.observableArrayList(loanList);
     }
 
     private void deleteLoan(Loan loan) {
+        // Configura le colonne della tabella
+        bookTitleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBookTitle()));
+        usernameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUsername()));
+        firstNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFirstName()));
+        lastNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getLastName()));
+        emailColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));
+        phoneNumberColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPhoneNumber()));
+        loanDateColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getLoanDate()));
+        returnDateColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getReturnDate()));
+
+        // Carica i dati nella tabella
+        loanTable.setItems(getLoans());
+
+        // Configura il pulsante "Indietro"
+        backButton.setOnAction(event -> handleBack());
+
+        // Aggiungi un listener per gestire la pressione del tasto DELETE
+        loanTable.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.DELETE) {
+                Loan selectedLoan = loanTable.getSelectionModel().getSelectedItem();
+                if (selectedLoan != null) {
+                    deleteLoan(selectedLoan);
+                }
+            }
+        });
+
+        // Aggiungi un listener per gestire la selezione di un prestito
+        loanTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                // Eseguire azioni quando un prestito è selezionato
+            }
+        });
+
         MongoDatabase database = DatabaseConnection.getDatabase();
         MongoCollection<Document> loans = database.getCollection("loans");
 
@@ -135,12 +201,13 @@ public class LoanManagementController {
                 .append("loanDate", loan.getLoanDate().toString());
 
         loans.deleteOne(query);
-        loanTable.getItems().remove(loan);
-        System.out.println("Prestito eliminato: " + loan);
+
+        // Aggiorna la tabella dopo l'eliminazione
+        loanTable.setItems(getLoans());
     }
 
-    public void setCurrentUser (User user) {
-        this.currentUser  = user;
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
     }
 
     @FXML
