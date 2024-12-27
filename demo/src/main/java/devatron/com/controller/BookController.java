@@ -23,6 +23,7 @@ import javafx.util.Duration;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +48,16 @@ public class BookController {
     private TextField quantityField, availableQuantityField, publishYearField, priceField;
 
     @FXML
-    private TextField titleFilterField, authorFilterField, editorFilterField, genreFilterField, priceFilterField;
+    private TextField titleFilterField, authorFilterField, editorFilterField, genreFilterField, isbnFitlerField;
+
+    @FXML
+    private Slider minPriceSlider;
+
+    @FXML
+    private Slider maxPriceSlider;
+
+    @FXML
+    private Label priceRangeLabel;
 
     @FXML
     private Button backButton;
@@ -147,11 +157,32 @@ public class BookController {
         });
 
         // Filtri
+        isbnFitlerField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         titleFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         authorFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         editorFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
         genreFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
-        priceFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
+        minPriceSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() > maxPriceSlider.getValue()) {
+                minPriceSlider.setValue(maxPriceSlider.getValue());
+            }
+            updatePriceRangeLabel();
+            applyFilters();
+        });
+    
+        maxPriceSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() < minPriceSlider.getValue()) {
+                maxPriceSlider.setValue(minPriceSlider.getValue());
+            }
+            updatePriceRangeLabel();
+            applyFilters();
+        });
+
+        forceUppercase(titleField);
+        forceUppercase(authorField);
+        forceUppercase(editorField);
+        forceUppercase(genreField);
+        forceUppercase(isbnField);
 
         // Eventi per i pulsanti
         backButton.setOnAction(event -> backButtonAction());
@@ -184,6 +215,13 @@ public class BookController {
             }
         });
     }
+
+    private void updatePriceRangeLabel() {
+        int minPrice = (int) minPriceSlider.getValue();
+        int maxPrice = (int) maxPriceSlider.getValue();
+        priceRangeLabel.setText("Da €" + minPrice + " a €" + maxPrice);
+    }
+    
 
     private void createBookContextMenu() {
         bookContextMenu = new ContextMenu();
@@ -306,22 +344,26 @@ public class BookController {
     }
 
     private void applyFilters() {
+        String isbnFilter = isbnFitlerField.getText().toLowerCase();
         String titleFilter = titleFilterField.getText().toLowerCase();
         String authorFilter = authorFilterField.getText().toLowerCase();
         String editorFilter = editorFilterField.getText().toLowerCase();
         String genreFilter = genreFilterField.getText().toLowerCase();
-        String priceFilter = priceFilterField.getText().toLowerCase();
-
+        double minPrice = minPriceSlider.getValue();
+        double maxPrice = maxPriceSlider.getValue();
+    
         List<Book> filteredBooks = books.stream()
+                .filter(book -> book.getIsbn().toLowerCase().contains(isbnFilter))
                 .filter(book -> book.getTitle().toLowerCase().contains(titleFilter))
                 .filter(book -> book.getAuthor().toLowerCase().contains(authorFilter))
                 .filter(book -> book.getEditor().toLowerCase().contains(editorFilter))
                 .filter(book -> book.getGenre().toLowerCase().contains(genreFilter))
-                .filter(book -> book.getPrice() >= Double.parseDouble(priceFilter))
+                .filter(book -> book.getPrice() >= minPrice && book.getPrice() <= maxPrice)
                 .collect(Collectors.toList());
-
+    
         bookTable.setItems(FXCollections.observableArrayList(filteredBooks));
     }
+    
 
     private void editBookDetails(Book book) {
         Dialog<List<String>> dialog = new Dialog<>();
@@ -490,63 +532,76 @@ public class BookController {
         String editor = editorField.getText();
         String genre = genreField.getText();
         String isbn = isbnField.getText();
-        int quantity = Integer.parseInt(quantityField.getText());
-        int availableQuantity = Integer.parseInt(availableQuantityField.getText());
-        int publishYear = Integer.parseInt(publishYearField.getText());
-        double price = Double.parseDouble(priceField.getText());
-
-        if (title.isEmpty() || author.isEmpty() || editor.isEmpty() ||
-                genre.isEmpty() || isbn.isEmpty() || quantityField.getText().isEmpty() ||
-                availableQuantityField.getText().isEmpty() || publishYearField.getText().isEmpty() ||
-                priceField.getText().isEmpty()) {
-            showAlert("Errore", "Tutti i campi devono essere compilati.");
+        int quantity;
+        int availableQuantity;
+        int publishYear;
+        double price;
+    
+        if (title.isEmpty()) {
+            showErrorAndFocus(titleField, "Il titolo è obbligatorio.");
             return;
         }
-
-        if (isbn.length() != 13) { // Controlla che l'ISBN abbia 13 caratteri
-            showAlert("Errore", "Il codice ISBN deve essere lungo 13 caratteri.");
+    
+        if (author.isEmpty()) {
+            showErrorAndFocus(authorField, "L'autore è obbligatorio.");
             return;
         }
-
+    
+        if (editor.isEmpty()) {
+            showErrorAndFocus(editorField, "L'editore è obbligatorio.");
+            return;
+        }
+    
+        if (genre.isEmpty()) {
+            showErrorAndFocus(genreField, "Il genere è obbligatorio.");
+            return;
+        }
+    
+        if (isbn.isEmpty() || isbn.length() != 13) {
+            showErrorAndFocus(isbnField, "Il codice ISBN deve essere di 13 caratteri.");
+            return;
+        }
+    
         try {
-            // Validazione e conversione della quantità
             quantity = Integer.parseInt(quantityField.getText());
             if (quantity < 0) {
-                showAlert("Errore", "La quantità non può essere negativa.");
+                showErrorAndFocus(quantityField, "La quantità non può essere negativa.");
                 return;
             }
-
-            // Validazione e conversione della quantità disponibile
+    
             availableQuantity = Integer.parseInt(availableQuantityField.getText());
             if (availableQuantity < 0 || availableQuantity > quantity) {
-                showAlert("Errore", "La quantità disponibile deve essere compresa tra 0 e la quantità totale.");
+                showErrorAndFocus(availableQuantityField, "La quantità disponibile deve essere compresa tra 0 e la quantità totale.");
                 return;
             }
-
-            // Validazione e conversione dell'anno di pubblicazione
+    
             publishYear = Integer.parseInt(publishYearField.getText());
-            if (publishYear < 1000 || publishYear > 9999) { // Limiti ragionevoli per un anno
-                showAlert("Errore", "L'anno di pubblicazione deve essere un valore valido (ad esempio, 2024).");
+            if (publishYear < 1900 || publishYear > LocalDate.now().getYear()) {
+                showErrorAndFocus(publishYearField, "L'anno di pubblicazione deve essere valido.");
                 return;
             }
-
-            // Validazione e conversione del prezzo
+    
             price = Double.parseDouble(priceField.getText());
             if (price < 0) {
-                showAlert("Errore", "Il prezzo non può essere negativo.");
+                showErrorAndFocus(priceField, "Il prezzo non può essere negativo.");
                 return;
             }
-
         } catch (NumberFormatException e) {
-            showAlert("Errore",
-                    "Quantità, quantità disponibile, anno di pubblicazione e prezzo devono essere valori numerici validi.");
+            showAlert("Errore", "Quantità, quantità disponibile, anno di pubblicazione e prezzo devono essere valori numerici validi.");
             return;
         }
-
+    
         try {
             MongoDatabase database = DatabaseConnection.getDatabase();
             MongoCollection<Document> booksCollection = database.getCollection("books");
-
+    
+            // Controllo se il codice ISBN esiste già nel database
+            Document existingBook = booksCollection.find(new Document("isbn", isbn)).first();
+            if (existingBook != null) {
+                showErrorAndFocus(isbnField, "Esiste già un libro con questo codice ISBN.");
+                return;
+            }
+    
             Document newBook = new Document("title", title)
                     .append("author", author)
                     .append("editor", editor)
@@ -557,25 +612,61 @@ public class BookController {
                     .append("quantity", quantity)
                     .append("availableQuantity", availableQuantity);
             booksCollection.insertOne(newBook);
+    
+            clearFields();
+            // Devo aggiornare la lista dei libri 
 
-            titleField.clear();
-            authorField.clear();
-            editorField.clear();
-            quantityField.clear();
-            availableQuantityField.clear();
-            genreField.clear();
-            isbnField.clear();
-            publishYearField.clear();
-            priceField.clear();
-
-            // Refresh the TableView
             books.setAll(getBooks());
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error adding book: " + e.getMessage());
+            System.err.println("Errore durante l'aggiunta del libro: " + e.getMessage());
         }
     }
 
+    private void showErrorAndFocus(TextField field, String errorMessage) {
+        showAlert("Errore", errorMessage);
+        field.requestFocus();
+        field.setStyle("-fx-border-color: red; -fx-border-width: 2;");
+    }
+    
+    // Metodo per forzare la maiuscola
+    private void forceUppercase(TextField field) {
+        field.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.isEmpty()) {
+                field.setText(newValue.substring(0, 1).toUpperCase() + newValue.substring(1));
+            }
+        });
+    }
+
+    
+    // Metodo per pulire e ripristinare lo stile dei campi
+    private void clearFields() {
+        titleField.clear();
+        authorField.clear();
+        editorField.clear();
+        genreField.clear();
+        isbnField.clear();
+        quantityField.clear();
+        availableQuantityField.clear();
+        publishYearField.clear();
+        priceField.clear();
+    
+        // Ripristina lo stile originale
+        resetFieldStyle(titleField);
+        resetFieldStyle(authorField);
+        resetFieldStyle(editorField);
+        resetFieldStyle(genreField);
+        resetFieldStyle(isbnField);
+        resetFieldStyle(quantityField);
+        resetFieldStyle(availableQuantityField);
+        resetFieldStyle(publishYearField);
+        resetFieldStyle(priceField);
+    }
+    
+    private void resetFieldStyle(TextField field) {
+        field.setStyle(""); // Rimuove lo stile aggiunto
+    }
+    
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

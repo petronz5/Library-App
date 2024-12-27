@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="devatron.com.controller.AddBookController" alignment="CENTER" spacing="15" prefWidth="600" prefHeight="400" stylesheets="@styles.css">
+    <Label text="Aggiungi un Nuovo Libro" styleClass="header-label" />
+    <GridPane alignment="CENTER" hgap="10" vgap="10">
+        <TextField fx:id="titleField" promptText="Titolo" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="authorField" promptText="Autore" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <TextField fx:id="editorField" promptText="Editore" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="quantityField" promptText="Quantità Totale" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <TextField fx:id="availableQuantityField" promptText="Quantità Disponibile" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="genreField" promptText="Genere" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <TextField fx:id="priceField" promptText="Prezzo (€)" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="isbnField" promptText="ISBN" styleClass="custom-text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <TextField fx:id="publishYearField" promptText="Anno di Pubblicazione" styleClass="custom-text-field" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <Button fx:id="saveBookButton" text="Salva Libro" styleClass="primary-button" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+    </GridPane>
+</VBox>

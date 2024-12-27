@@ -153,3 +153,21 @@
     -fx-background-radius: 3;
     -fx-background-color: white;
 }
+
+
+/* Slider personalizzato */
+.custom-slider {
+    -fx-padding: 5px;
+    -fx-background-color: #ddd;
+}
+
+.filter-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #333;
+}
+
+.text-field-error {
+    -fx-border-color: red;
+    -fx-border-width: 2px;
+    -fx-border-radius: 3px;
+}

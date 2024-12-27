@@ -15,6 +15,8 @@ import org.bson.Document;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 
 public class UserLoanController {
 
@@ -65,6 +67,23 @@ public class UserLoanController {
                 errorLabel.setVisible(true);
             } else {
                 errorLabel.setVisible(false); // Nascondi il messaggio di errore se la lunghezza è valida
+            }
+        });
+
+        /*
+         * Aggiungi un listener per il campo dell'indirizzo email
+         * L'indirizzo deve terminare con @gmail.com oppure @libero.it
+         */
+        emailField.textProperty().addListener((observable, oldValue, newValue) -> {
+            List<String> allowedDomains = Arrays.asList("@gmail.com", "@libero.it, @icloud.com , @hotmail.com");
+
+            boolean validDomain = allowedDomains.stream().anyMatch(newValue::endsWith);
+            if (!validDomain) {
+                errorLabel.setText("L'indirizzo email deve essere verificato");
+                errorLabel.setVisible(true);
+            }
+            else {
+                errorLabel.setVisible(false);
             }
         });
     }
@@ -128,21 +147,50 @@ public class UserLoanController {
     
 
     private boolean validateUserInput() {
-        boolean isValid =   !usernameField.getText().isEmpty() &&
-                            !firstNameField.getText().isEmpty() &&
-                            !lastNameField.getText().isEmpty() &&
-                            !emailField.getText().isEmpty() &&
-                            !phoneNumberField.getText().isEmpty();
-        
-        String phoneNumber = phoneNumberField.getText();
-        if (phoneNumber.length() < 9 || phoneNumber.length() > 10) {
-            errorLabel.setText("Il numero di telefono deve avere tra 9 e 10 cifre.");
-            errorLabel.setVisible(true);
+        boolean isValid = true;
+    
+        // Rimuovi errori pre-esistenti
+        clearValidationError(usernameField);
+        clearValidationError(firstNameField);
+        clearValidationError(lastNameField);
+        clearValidationError(emailField);
+        clearValidationError(phoneNumberField);
+    
+        if (usernameField.getText().isEmpty()) {
+            showValidationError(usernameField, "Il campo Username è obbligatorio.");
             isValid = false;
-        } else {
-            errorLabel.setVisible(false);
         }
+        if (firstNameField.getText().isEmpty()) {
+            showValidationError(firstNameField, "Il campo Nome è obbligatorio.");
+            isValid = false;
+        }
+        if (lastNameField.getText().isEmpty()) {
+            showValidationError(lastNameField, "Il campo Cognome è obbligatorio.");
+            isValid = false;
+        }
+        if (emailField.getText().isEmpty() || !emailField.getText().matches(".+@(gmail|libero|icloud|hotmail)\\.com$")) {
+            showValidationError(emailField, "Inserisci un'email valida (es. @gmail.com).");
+            isValid = false;
+        }
+        if (phoneNumberField.getText().isEmpty() || phoneNumberField.getText().length() < 9 || phoneNumberField.getText().length() > 10) {
+            showValidationError(phoneNumberField, "Il numero di telefono deve avere tra 9 e 10 cifre.");
+            isValid = false;
+        }
+    
         return isValid;
+    }
+
+    // Mostra errore nella TextField e imposta il bordo rosso
+    private void showValidationError(TextField field, String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        field.getStyleClass().add("text-field-error");
+        field.requestFocus();
+    }
+
+    // Rimuove lo stato di errore dalla TextField
+    private void clearValidationError(TextField field) {
+        field.getStyleClass().remove("text-field-error");
     }
 
     public void setCurrentUser(User user) {

@@ -10,12 +10,19 @@
             <!-- Pannello dei filtri -->
             <VBox fx:id="filterPane" alignment="TOP_CENTER" spacing="15" styleClass="filter-pane" maxWidth="300" minWidth="2" visible="true">
                 <Label text="Filtri" styleClass="filter-header-label" />
+                <TextField fx:id="isbnFitlerField" promptText="ISBN" styleClass="custom-text-field" />
                 <TextField fx:id="titleFilterField" promptText="Titolo" styleClass="custom-text-field" />
                 <TextField fx:id="authorFilterField" promptText="Autore" styleClass="custom-text-field" />
                 <TextField fx:id="editorFilterField" promptText="Editore" styleClass="custom-text-field" />
                 <TextField fx:id="genreFilterField" promptText="Genere" styleClass="custom-text-field" />
-                <TextField fx:id="priceFilterField" promptText="Prezzo (€)" styleClass="custom-text-field" />
+                <Label text="Prezzo (€)" styleClass="filter-label" />
+                <HBox spacing="10" alignment="CENTER">
+                    <Slider fx:id="minPriceSlider" min="4" max="70" value="4" blockIncrement="1" styleClass="custom-slider" />
+                    <Slider fx:id="maxPriceSlider" min="4" max="70" value="70" blockIncrement="1" styleClass="custom-slider" />
+                </HBox>
+                <Label fx:id="priceRangeLabel" text="Da €4 a €70" styleClass="filter-label" />
             </VBox>
+
 
             <!-- Bottone per il toggle posizionato sul lato destro -->
             <Button fx:id="toggleFilterButton" text="►" onAction="#toggleFilterPane" styleClass="third-button"
